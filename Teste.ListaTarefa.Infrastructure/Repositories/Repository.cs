@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TaskListAPI.Infrastructure.Data;
 using Teste.ListaTarefa.Domain.Interfaces;
 
 namespace Teste.ListaTarefa.Infrastructure.Repositories

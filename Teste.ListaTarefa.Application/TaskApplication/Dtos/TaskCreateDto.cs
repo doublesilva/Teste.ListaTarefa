@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Task = Teste.ListaTarefa.Domain.Entities.Task;
+﻿using Task = Teste.ListaTarefa.Domain.Entities.Task;
 
 namespace Teste.ListaTarefa.Application.TaskApplication.Dtos
 {

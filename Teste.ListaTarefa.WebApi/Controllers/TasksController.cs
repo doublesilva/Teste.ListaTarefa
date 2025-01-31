@@ -7,7 +7,7 @@ using Teste.ListaTarefa.WebApi.Controllers.Bases;
 namespace Teste.ListaTarefa.WebApi.Controllers
 {
     [ApiController]
-    public class TasksController(IMediator mediator, ILogger logger) : ControllerMiddlewareBase(mediator, logger)
+    public class TasksController(IMediator mediator) : ControllerMiddlewareBase(mediator)
     {
         [HttpGet, Produces("application/json", Type = typeof(List<TaskQueryDto>))]
         public async Task<IActionResult> Get()
@@ -17,7 +17,7 @@ namespace Teste.ListaTarefa.WebApi.Controllers
         public async Task<IActionResult> Get([FromRoute]int taskId)
                               => await Send(new TaskQuery(taskId));
 
-        [HttpPost, Produces("application/json", Type = typeof(bool))]
+        [HttpPost, Produces("application/json", Type = typeof(int))]
         public async Task<IActionResult> Create([FromBody] TaskCreateDto task)
                               => await Send(new CreateTaskCommand(task));
 

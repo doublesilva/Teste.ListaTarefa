@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
-using Teste.ListaTarefa.Domain.Entities;
 using Task = Teste.ListaTarefa.Domain.Entities.Task;
 
 

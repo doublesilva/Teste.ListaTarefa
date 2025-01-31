@@ -1,13 +1,11 @@
-version: '3.4'
-
 services:
-  api:
-    image: ${DOCKER_REGISTRY-}api
+  webapi:
+    image: ${DOCKER_REGISTRY-}webapi
     build:
       context: .
       dockerfile: Teste.ListaTarefa.WebApi/Dockerfile
     ports:
-      - "5000:80"
+      - "5000:8080"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     volumes:
@@ -19,11 +17,3 @@ services:
     image: nouchka/sqlite3
     volumes:
       - ./AppData:/data
-
-  e2etests:
-    image: ${DOCKER_REGISTRY-}e2etests
-    build:
-      context: .
-      dockerfile: Teste.ListaTarefa.E2ETest/Dockerfile
-    depends_on:
-      - api

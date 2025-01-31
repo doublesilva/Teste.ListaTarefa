@@ -1,7 +1,6 @@
-# ListaTarefa API
+# Lista Tarefas API
 
-Este projeto é uma API .NET 8 utilizando Entity Framework Core com SQLite, Docker 
-e seguindo os princípios de Domain-Driven Design (DDD) e CQRS.
+Este projeto é uma API .NET 8 utilizando Entity Framework Core com SQLite e Docker, seguindo os princípios de Domain-Driven Design (DDD) e CQRS.
 
 ## Arquitetura
 
@@ -55,6 +54,41 @@ Certifique-se de ter o Docker e o Docker Compose instalados na sua máquina.
 
    Isso irá iniciar a aplicação na porta `5000` e criar o banco de dados SQLite no diretório `./AppData`.
 
+3. **Acessar a Documentação Swagger**
+
+   Após iniciar a aplicação, acesse a documentação Swagger no seguinte URL:
+
+   ```url
+   http://localhost:5000/swagger/index.html
+   ```
+
+## Estrutura dos Diretórios
+
+A estrutura do projeto está organizada da seguinte forma:
+
+```plaintext
+Teste.ListaTarefa
+├── Teste.ListaTarefa.Domain
+│   ├── Entities
+│   ├── Interfaces
+│   └── Services
+├── Teste.ListaTarefa.Infrastructure
+│   ├── Repositories
+│   └── Configuration
+├── Teste.ListaTarefa.Application
+│   ├── Commands
+│   ├── Queries
+│   ├── Handlers
+│   └── DTOs
+├── Teste.ListaTarefa.WebApi
+│   ├── Controllers
+│   ├── Middleware
+│   └── Docker
+└── Tests
+    ├── Teste.ListaTarefa.UnitTest
+    └── Teste.ListaTarefa.IntegrationTest
+```
+
 ### Executando os Testes
 
 #### Testes Unitários
@@ -63,4 +97,12 @@ Para executar os testes unitários, utilize o comando:
 
 ```bash
 dotnet test Teste.ListaTarefa.UnitTest/Teste.ListaTarefa.UnitTest.csproj
+```
+
+#### Testes de Integração
+
+Para executar os testes de integração, utilize o comando:
+
+```bash
+dotnet test Teste.ListaTarefa.IntegrationTest/Teste.ListaTarefa.IntegrationTest.csproj
 ```

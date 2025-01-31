@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Teste.ListaTarefa.Application.TaskApplication.Dtos;
-using Teste.ListaTarefa.Domain.Entities;
 using Teste.ListaTarefa.Domain.Interfaces;
 using Task = Teste.ListaTarefa.Domain.Entities.Task;
 
@@ -18,7 +17,9 @@ namespace Teste.ListaTarefa.Application.TaskApplication
                 throw new ArgumentException("Task not found");
             }
             var dto = request.Dto;
-            task.SetInfo(dto.Title, dto.Description, dto.OwnerId, dto.StartDate, dto.DueDate);
+            task.SetTitle(dto.Title);
+            task.SetDescription(dto.Description);
+            task.SetInfo(dto.OwnerId, dto.StartDate, dto.DueDate);
 
             await repository.UpdateAsync(task, cancellationToken);
 

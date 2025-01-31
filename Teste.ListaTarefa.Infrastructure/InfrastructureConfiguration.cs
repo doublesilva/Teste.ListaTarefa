@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using TaskListAPI.Infrastructure.Data;
 using Teste.ListaTarefa.Domain.Interfaces;
 using Teste.ListaTarefa.Infrastructure.Repositories;
 

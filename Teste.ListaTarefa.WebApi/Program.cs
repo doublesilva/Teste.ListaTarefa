@@ -1,12 +1,21 @@
-using MediatR;
-using AutoMapper;
-using Microsoft.Extensions.DependencyInjection;
 using Teste.ListaTarefa.Application.TaskApplication;
 using Teste.ListaTarefa.Infrastructure;
 using Teste.ListaTarefa.Application.TaskApplication.Dtos;
 using FluentValidation;
+using System.Reflection;
+using Microsoft.Extensions.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
+IConfiguration configuration = new ConfigurationBuilder()
+    .AddJsonFile($"appsettings.json", optional: true)
+    .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true)
+    .AddUserSecrets(Assembly.GetExecutingAssembly(), optional: true)
+    .Build();
+
 
 // Configurações de Infraestrutura
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -17,7 +26,6 @@ builder.Services.AddMediatR(c => c.RegisterServicesFromAssembly(typeof(CreateTas
 
 // Adicionar FluentValidation
 builder.Services.AddValidatorsFromAssemblyContaining<TaskCreateDtoValidator>();
-
 
 builder.Services.AddControllers();
 
@@ -38,6 +46,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+
 // Configurar o Swagger (se desejar)
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -46,3 +55,4 @@ app.UseSwaggerUI(c =>
 });
 
 app.Run();
+public partial class Program { }

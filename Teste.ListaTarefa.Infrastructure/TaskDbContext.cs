@@ -4,7 +4,7 @@ using Teste.ListaTarefa.Domain.Entities;
 using Teste.ListaTarefa.Infrastructure.Configurations;
 using Task = Teste.ListaTarefa.Domain.Entities.Task;
 
-namespace TaskListAPI.Infrastructure.Data
+namespace Teste.ListaTarefa.Infrastructure
 {
     public class TaskDbContext : DbContext
     {

@@ -5,14 +5,15 @@ using Task = Teste.ListaTarefa.Domain.Entities.Task;
 
 namespace Teste.ListaTarefa.Application.TaskApplication
 {
-    public record CreateTaskCommand(TaskCreateDto Input) : IRequest<bool>;
+    public record CreateTaskCommand(TaskCreateDto Input) : IRequest<int>;
 
-    public class CreateTaskCommandHandler(IRepository<Task> taskRepo) : IRequestHandler<CreateTaskCommand, bool>
+    public class CreateTaskCommandHandler(IRepository<Task> taskRepo) : IRequestHandler<CreateTaskCommand, int>
     {
-        public async Task<bool> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
+        public async Task<int> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
         {
-            await taskRepo.AddAsync(request.Input, cancellationToken);
-            return true;
+            var task = (Task)request.Input;
+            await taskRepo.AddAsync(task, cancellationToken);
+            return task.Id;
         }
     }
 }
