@@ -12,58 +12,74 @@ using Microsoft.EntityFrameworkCore;
 using Teste.ListaTarefa.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
+using System.IO;
+using System.Linq;
 
 namespace Teste.ListaTarefa.IntegrationTest
 {
-    public class TaskIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+    public class TaskIntegrationTests : IClassFixture<CustomWebApplicationFactory<Program>>, IAsyncLifetime
     {
- 
-        private readonly WebApplicationFactory<Program> _factory;
+        private readonly CustomWebApplicationFactory<Program> _factory;
         private readonly HttpClient _client;
-        private readonly ILogger<TaskIntegrationTests> _logger;
-        public TaskIntegrationTests(WebApplicationFactory<Program> factory)
+        private readonly IServiceScope _scope;
+        private TaskDbContext _context;
+
+        public TaskIntegrationTests(CustomWebApplicationFactory<Program> factory)
         {
-            _factory = factory.WithWebHostBuilder(builder =>
-            {
-                builder.UseEnvironment("Testing");
-
-                builder.ConfigureServices(services =>
-                {
-                    services.AddScoped<TaskDbContext>(provider =>
-                    {
-                        var options = new DbContextOptionsBuilder<TaskDbContext>()
-                            .UseInMemoryDatabase(databaseName: $"DBIntegration")
-                            .Options;
-
-                        return new TaskDbContext(options);
-                    });
-
-                    services.AddSingleton<ILoggerFactory>(serviceProvider =>
-                    {
-                        var loggerFactory = LoggerFactory.Create(config =>
-                        {
-                            config.AddConsole();
-                            config.AddDebug();
-                            config.SetMinimumLevel(LogLevel.Debug);
-                        });
-                        return loggerFactory;
-                    });
-
-                    services.AddLogging();
-                });
-
-            });
-
+            _factory = factory;
             _client = _factory.CreateClient();
-            // Crie uma instância de ILogger utilizando o LoggerFactory
-            var loggerFactory = _factory.Services.GetRequiredService<ILoggerFactory>();
-            _logger = loggerFactory.CreateLogger<TaskIntegrationTests>();
-            _logger.LogInformation("Initializing integration tests...");
+
+            _scope = _factory.Services.CreateScope();
+            _context = _scope.ServiceProvider.GetRequiredService<TaskDbContext>();
+        }
+        public async Task InitializeAsync()
+        { 
+        //    await _context.Database.EnsureDeletedAsync();
+        //    await _context.Database.EnsureCreatedAsync();
+        //    await _context.Database.MigrateAsync();
+            await VerifyMigrationsApplied();
         }
 
+
+
+        public Task DisposeAsync()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
+            _scope.Dispose();
+            return Task.CompletedTask;
+        }
+
+        private async Task VerifyMigrationsApplied()
+        {
+            var appliedMigrations = await _context.Database.GetAppliedMigrationsAsync();
+            var pendingMigrations = await _context.Database.GetPendingMigrationsAsync();
+
+            Assert.Empty(pendingMigrations);
+            Assert.NotEmpty(appliedMigrations);
+        }
+
+
+        // Initialize the database before each test
+        public void Initialize()
+        {
+            //var options = new DbContextOptionsBuilder<TaskDbContext>()
+            //    .UseSqlite("Data Source=:memory:")
+            //    .Options;
+
+            //using (var context = new TaskDbContext(options))
+            //{
+            //    context.Database.EnsureDeleted();
+            //    context.Database.OpenConnection();
+            //    context.Database.EnsureCreated();
+            //    context.Database.Migrate();
+            //}
+        }
         [Fact]
         public async Task CreateTask_ShouldAddTask()
         {
+            Initialize();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var response = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -76,6 +92,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task GetTask_ShouldReturnTask()
         {
+            Initialize();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -93,6 +110,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task UpdateTask_ShouldModifyTask()
         {
+            Initialize();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -120,6 +138,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task DeleteTask_ShouldRemoveTask()
         {
+            Initialize();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -140,6 +159,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task GetAllTasks_ShouldReturnAllTasks()
         {
+            Initialize();
             var task1 = new TaskCreateDto("Test Task 1", "Test Description 1");
 
             var task2 = new TaskCreateDto("Test Task 2", "Test Description 2");
@@ -154,6 +174,15 @@ namespace Teste.ListaTarefa.IntegrationTest
             Assert.NotNull(result);
             Assert.True(result.Count >= 2);
         }
-    }
 
+
+
+        public void Dispose()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
+            _scope.Dispose();
+
+        }
+    }
 }

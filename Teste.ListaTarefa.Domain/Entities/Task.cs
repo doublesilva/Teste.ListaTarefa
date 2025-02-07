@@ -2,7 +2,7 @@
 {
     public class Task : BaseEntity
     {
-        public Task(string title, string description, int authorId = 0)
+        public Task(string title, string description, int authorId = 1)
         {
             SetTitle(title);
             SetDescription(description);

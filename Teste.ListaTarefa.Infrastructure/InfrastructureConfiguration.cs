@@ -11,7 +11,7 @@ namespace Teste.ListaTarefa.Infrastructure
         {
             // Configurações do EF Core
             services.AddDbContext<TaskDbContext>(options =>
-                options.UseSqlite(connectionString));
+                           options.UseSqlite(connectionString));
 
             // Repositórios
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));

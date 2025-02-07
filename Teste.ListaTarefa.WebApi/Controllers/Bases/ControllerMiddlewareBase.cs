@@ -24,22 +24,22 @@ namespace Teste.ListaTarefa.WebApi.Controllers.Bases
                 {
                     return BadRequest(ex.Message);
                 }
-                catch (ValidationException ex)
-                {
-                    return BadRequest(ex.Message);
-                }
-                catch (AccessViolationException ex)
-                {
-                    return Unauthorized(ex.Message);
-                }
-                catch (KeyNotFoundException ex)
-                {
-                    return NotFound(ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    return base.StatusCode(500, "Falha ao tentar executar ação");
-                }
+                //catch (ValidationException ex)
+                //{
+                //    return BadRequest(ex.Message);
+                //}
+                //catch (AccessViolationException ex)
+                //{
+                //    return Unauthorized(ex.Message);
+                //}
+                //catch (KeyNotFoundException ex)
+                //{
+                //    return NotFound(ex.Message);
+                //}
+                //catch (Exception ex)
+                //{
+                //    return base.StatusCode(500, "Falha ao tentar executar ação");
+                //}
             }
         }
 

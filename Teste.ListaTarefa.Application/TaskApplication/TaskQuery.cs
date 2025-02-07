@@ -11,7 +11,7 @@ namespace Teste.ListaTarefa.Application.TaskApplication
     {
         public async Task<TaskQueryDto> Handle(TaskQuery request, CancellationToken cancellationToken)
         {
-            var task = await taskRepo.GetByIdAsync(request.TaskId, cancellationToken);
+            var task = await taskRepo.GetByIdAsync(request.TaskId, cancellationToken, x => x.Author, x => x.Owner);
             if (task == null)
             {
                 throw new KeyNotFoundException("Task not found");
