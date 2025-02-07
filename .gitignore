@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Teste.ListaTarefa.WebApi/AppData/tarefas.db
+/Teste.ListaTarefa.WebApi/AppData/tarefas.db-shm
+/Teste.ListaTarefa.WebApi/AppData/tarefas.db-wal
