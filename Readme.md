@@ -85,8 +85,7 @@ Teste.ListaTarefa
 │   ├── Middleware
 │   └── Docker
 └── Tests
-    ├── Teste.ListaTarefa.UnitTest
-    └── Teste.ListaTarefa.IntegrationTest
+    └── Teste.ListaTarefa.UnitTest
 ```
 
 ### Executando os Testes
@@ -97,12 +96,4 @@ Para executar os testes unitários, utilize o comando:
 
 ```bash
 dotnet test Teste.ListaTarefa.UnitTest/Teste.ListaTarefa.UnitTest.csproj
-```
-
-#### Testes de Integração
-
-Para executar os testes de integração, utilize o comando:
-
-```bash
-dotnet test Teste.ListaTarefa.IntegrationTest/Teste.ListaTarefa.IntegrationTest.csproj
 ```

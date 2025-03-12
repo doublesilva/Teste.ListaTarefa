@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using System.IO;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Sqlite.Infrastructure.Internal;
 
 namespace Teste.ListaTarefa.IntegrationTest
 {
@@ -24,6 +25,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         private readonly HttpClient _client;
         private readonly IServiceScope _scope;
         private TaskDbContext _context;
+        private DbContextOptions<TaskDbContext> _options;
 
         public TaskIntegrationTests(CustomWebApplicationFactory<Program> factory)
         {
@@ -32,16 +34,15 @@ namespace Teste.ListaTarefa.IntegrationTest
 
             _scope = _factory.Services.CreateScope();
             _context = _scope.ServiceProvider.GetRequiredService<TaskDbContext>();
+
+            _options = new DbContextOptionsBuilder<TaskDbContext>()
+                .UseSqlite("Data Source=:memory:")
+                .Options;
         }
         public async Task InitializeAsync()
-        { 
-        //    await _context.Database.EnsureDeletedAsync();
-        //    await _context.Database.EnsureCreatedAsync();
-        //    await _context.Database.MigrateAsync();
-            await VerifyMigrationsApplied();
+        {
+            await InitializeDatabaseAsync();
         }
-
-
 
         public Task DisposeAsync()
         {
@@ -51,6 +52,28 @@ namespace Teste.ListaTarefa.IntegrationTest
             return Task.CompletedTask;
         }
 
+        private async Task InitializeDatabaseAsync()
+        {
+            await CleanupDatabaseAsync();
+
+            using (var context = new TaskDbContext(_options))
+            {
+                context.Database.OpenConnection();
+                context.Database.EnsureCreated();
+                context.Database.Migrate();
+            }
+
+            await VerifyMigrationsApplied();
+        }
+
+        private async Task CleanupDatabaseAsync()
+        {
+            using (var context = new TaskDbContext(_options))
+            {
+                await context.Database.EnsureDeletedAsync();
+            }
+        }
+
         private async Task VerifyMigrationsApplied()
         {
             var appliedMigrations = await _context.Database.GetAppliedMigrationsAsync();
@@ -58,28 +81,13 @@ namespace Teste.ListaTarefa.IntegrationTest
 
             Assert.Empty(pendingMigrations);
             Assert.NotEmpty(appliedMigrations);
+
         }
 
-
-        // Initialize the database before each test
-        public void Initialize()
-        {
-            //var options = new DbContextOptionsBuilder<TaskDbContext>()
-            //    .UseSqlite("Data Source=:memory:")
-            //    .Options;
-
-            //using (var context = new TaskDbContext(options))
-            //{
-            //    context.Database.EnsureDeleted();
-            //    context.Database.OpenConnection();
-            //    context.Database.EnsureCreated();
-            //    context.Database.Migrate();
-            //}
-        }
         [Fact]
         public async Task CreateTask_ShouldAddTask()
         {
-            Initialize();
+            await InitializeDatabaseAsync();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var response = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -92,7 +100,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task GetTask_ShouldReturnTask()
         {
-            Initialize();
+            await InitializeDatabaseAsync();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -110,7 +118,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task UpdateTask_ShouldModifyTask()
         {
-            Initialize();
+            await InitializeDatabaseAsync();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -138,7 +146,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task DeleteTask_ShouldRemoveTask()
         {
-            Initialize();
+            await InitializeDatabaseAsync();
             var task = new TaskCreateDto("Test Task", "Test Description");
 
             var createResponse = await _client.PostAsJsonAsync("/api/tasks", task);
@@ -159,7 +167,7 @@ namespace Teste.ListaTarefa.IntegrationTest
         [Fact]
         public async Task GetAllTasks_ShouldReturnAllTasks()
         {
-            Initialize();
+            await InitializeDatabaseAsync();
             var task1 = new TaskCreateDto("Test Task 1", "Test Description 1");
 
             var task2 = new TaskCreateDto("Test Task 2", "Test Description 2");
@@ -173,16 +181,6 @@ namespace Teste.ListaTarefa.IntegrationTest
             var result = await response.Content.ReadFromJsonAsync<List<TaskQueryDto>>();
             Assert.NotNull(result);
             Assert.True(result.Count >= 2);
-        }
-
-
-
-        public void Dispose()
-        {
-            _context.Database.EnsureDeleted();
-            _context.Dispose();
-            _scope.Dispose();
-
         }
     }
 }

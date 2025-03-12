@@ -19,6 +19,8 @@ RUN dotnet build --no-restore
 # Rodar testes unitários
 RUN dotnet test Teste.ListaTarefa.UnitTest/Teste.ListaTarefa.UnitTest.csproj --no-build --logger:trx
 
+# Rodar testes de integração
+RUN dotnet test Teste.ListaTarefa.IntegrationTest/Teste.ListaTarefa.IntegrationTest.csproj --no-build --logger:trx
 
 # Publicar artefato
 RUN dotnet publish Teste.ListaTarefa.WebApi/Teste.ListaTarefa.WebApi.csproj -c Release -o out
